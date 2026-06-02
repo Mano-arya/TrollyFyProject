@@ -64,4 +64,6 @@ echo "Starting Gunicorn on port ${PORT}..."
 exec gunicorn trollyfy_core.wsgi:application \
   --bind 0.0.0.0:${PORT} \
   --workers ${GUNICORN_WORKERS} \
+  --timeout ${GUNICORN_TIMEOUT}  --bind 0.0.0.0:${PORT} \
+  --workers ${GUNICORN_WORKERS} \
   --timeout ${GUNICORN_TIMEOUT}
