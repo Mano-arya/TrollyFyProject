@@ -5,20 +5,22 @@ from dotenv import load_dotenv
 # Load environment variables from .env
 load_dotenv()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-change-me')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+SECRET_KEY = os.environ["SECRET_KEY"]
+
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+
 ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    'testserver',
-    'trollyfyproject-866789048793.europe-west1.run.app',
+    host.strip()
+    for host in os.getenv("ALLOWED_HOSTS", "").split(",")
+    if host.strip()
 ]
+
 CSRF_TRUSTED_ORIGINS = [
-    'https://trollyfyproject-866789048793.europe-west1.run.app',
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
 ]
 
 # Application definition
