@@ -1,67 +1,30 @@
-#!/bin/sh
-set -e
+FROM python:3.12-slim
 
-echo "Starting TrollyFy Django app..."
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8080
+ENV DJANGO_SETTINGS_MODULE=trollyfy_core.settings
 
-: "${PORT:=8080}"
-: "${DJANGO_SETTINGS_MODULE:=trollyfy_core.settings}"
-: "${RUN_MIGRATIONS:=false}"
-: "${RUN_COLLECTSTATIC:=true}"
-: "${GUNICORN_WORKERS:=2}"
-: "${GUNICORN_TIMEOUT:=120}"
+WORKDIR /app
 
-if [ -z "$SECRET_KEY" ]; then
-  echo "ERROR: SECRET_KEY environment variable is missing."
-  exit 1
-fi
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    libpq-dev \
+    curl \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
 
-if [ -z "$ALLOWED_HOSTS" ]; then
-  echo "ERROR: ALLOWED_HOSTS environment variable is missing."
-  exit 1
-fi
+COPY requirements.txt /app/requirements.txt
 
-if [ -z "$DB_NAME" ]; then
-  echo "ERROR: DB_NAME environment variable is missing."
-  exit 1
-fi
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir gunicorn psycopg2-binary whitenoise
 
-if [ -z "$DB_USER" ]; then
-  echo "ERROR: DB_USER environment variable is missing."
-  exit 1
-fi
+COPY . /app
 
-if [ -z "$DB_PASSWORD" ]; then
-  echo "ERROR: DB_PASSWORD environment variable is missing."
-  exit 1
-fi
+RUN chmod +x /app/docker-entrypoint.sh
 
-if [ -z "$DB_HOST" ]; then
-  echo "ERROR: DB_HOST environment variable is missing."
-  echo "For Cloud SQL Unix socket, use: /cloudsql/PROJECT_ID:REGION:INSTANCE_NAME"
-  exit 1
-fi
+EXPOSE 8080
 
-echo "Using Django settings module: ${DJANGO_SETTINGS_MODULE}"
-echo "Using Cloud Run port: ${PORT}"
-echo "Using database host: ${DB_HOST}"
-
-if [ "$RUN_COLLECTSTATIC" = "true" ]; then
-  echo "Collecting static files..."
-  python manage.py collectstatic --noinput
-else
-  echo "Skipping collectstatic."
-fi
-
-if [ "$RUN_MIGRATIONS" = "true" ]; then
-  echo "Running database migrations..."
-  python manage.py migrate --noinput
-else
-  echo "Skipping migrations. Set RUN_MIGRATIONS=true to run them on startup."
-fi
-
-echo "Starting Gunicorn on port ${PORT}..."
-
-exec gunicorn trollyfy_core.wsgi:application \
-  --bind 0.0.0.0:${PORT} \
-  --workers ${GUNICORN_WORKERS} \
-  --timeout ${GUNICORN_TIMEOUT}
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
