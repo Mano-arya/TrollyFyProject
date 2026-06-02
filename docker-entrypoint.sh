@@ -6,9 +6,11 @@ echo "Starting TrollyFy Django app..."
 : "${PORT:=8080}"
 : "${DJANGO_SETTINGS_MODULE:=trollyfy_core.settings}"
 : "${RUN_MIGRATIONS:=false}"
-: "${RUN_COLLECTSTATIC:=true}"
+: "${RUN_COLLECTSTATIC:=false}"
 : "${GUNICORN_WORKERS:=2}"
 : "${GUNICORN_TIMEOUT:=120}"
+
+export DJANGO_SETTINGS_MODULE
 
 if [ -z "$SECRET_KEY" ]; then
   echo "ERROR: SECRET_KEY environment variable is missing."
@@ -44,6 +46,8 @@ fi
 echo "Using Django settings module: ${DJANGO_SETTINGS_MODULE}"
 echo "Using Cloud Run port: ${PORT}"
 echo "Using database host: ${DB_HOST}"
+echo "RUN_COLLECTSTATIC=${RUN_COLLECTSTATIC}"
+echo "RUN_MIGRATIONS=${RUN_MIGRATIONS}"
 
 if [ "$RUN_COLLECTSTATIC" = "true" ]; then
   echo "Collecting static files..."
@@ -56,14 +60,14 @@ if [ "$RUN_MIGRATIONS" = "true" ]; then
   echo "Running database migrations..."
   python manage.py migrate --noinput
 else
-  echo "Skipping migrations. Set RUN_MIGRATIONS=true to run them on startup."
+  echo "Skipping migrations."
 fi
 
-echo "Starting Gunicorn on port ${PORT}..."
+echo "Starting Gunicorn on 0.0.0.0:${PORT}..."
 
 exec gunicorn trollyfy_core.wsgi:application \
   --bind 0.0.0.0:${PORT} \
-  --workers ${GUNICORN_WORKERS} \
-  --timeout ${GUNICORN_TIMEOUT}  --bind 0.0.0.0:${PORT} \
-  --workers ${GUNICORN_WORKERS} \
-  --timeout ${GUNICORN_TIMEOUT}
+  --workers "${GUNICORN_WORKERS}" \
+  --timeout "${GUNICORN_TIMEOUT}" \
+  --access-logfile - \
+  --error-logfile -
