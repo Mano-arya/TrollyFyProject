@@ -8,7 +8,7 @@ echo "Starting TrollyFy Django app..."
 : "${RUN_MIGRATIONS:=false}"
 : "${RUN_COLLECTSTATIC:=false}"
 : "${GUNICORN_WORKERS:=2}"
-: "${GUNICORN_TIMEOUT:=120}"
+: "${GUNICORN_TIMEOUT:=500}"
 
 export DJANGO_SETTINGS_MODULE
 
