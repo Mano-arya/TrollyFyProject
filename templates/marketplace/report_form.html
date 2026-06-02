@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Report Listing | Trollyfy{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-7 col-lg-5">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-danger text-white text-center py-4">
+                <i class="bi bi-shield-exclamation display-6"></i>
+                <h4 class="fw-bold mb-0">Report Listing</h4>
+                <p class="small opacity-75 mb-0">Help us maintain a safe community</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4 p-3 bg-light rounded-3 border">
+                    <small class="text-muted d-block mb-1">Item being flagged:</small>
+                    <h6 class="fw-bold mb-0">{{ listing.title }}</h6>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Reason for Report</label>
+                        <select name="reason" class="form-select rounded-3" required>
+                            <option value="" disabled selected>Select a reason...</option>
+                            <option value="SCAM">Prohibited/Scam Content</option>
+                            <option value="INAPPROPRIATE">Inappropriate Language/Media</option>
+                            <option value="MISCATEGORIZED">Incorrect Category</option>
+                            <option value="DUPLICATE">Duplicate Listing</option>
+                            <option value="OTHER">Other Issues</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Additional Details (Optional)</label>
+                        <textarea name="description" class="form-control rounded-3" rows="3" placeholder="Please provide more context..."></textarea>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold">Submit Report</button>
+                        <a href="{% url 'listing_detail' listing.pk %}" class="btn btn-link text-muted text-decoration-none small">Cancel and Return</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Trollyfy | Campus Marketplace{% endblock %}</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        :root {
+            --primary-indigo: #2563eb;    /* Refined Indigo */
+            --dark-indigo: #1e40af;
+            --charcoal: #111827;
+            --slate-gray: #64748b;
+            --bg-light: #f8fafc;
+            --navbar-height: 70px;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        body {
+            background-color: var(--bg-light);
+            font-family: 'Inter', sans-serif;
+            color: var(--charcoal);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        
+        /* ── Standardized Alignment Container ── */
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        /* ── Refined Navbar ── */
+        .navbar {
+            min-height: var(--navbar-height);
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.5rem 0;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: #000 !important;
+            letter-spacing: -0.04em;
+            padding-left: 0;
+        }
+        .nav-link {
+            font-weight: 500;
+            color: #4b5563 !important;
+            font-size: 0.95rem;
+            padding: 0.75rem 0 !important;
+            transition: color 0.2s;
+        }
+        .nav-link:hover {
+            color: var(--primary-indigo) !important;
+        }
+        .nav-link.active {
+            color: var(--primary-indigo) !important;
+            font-weight: 700;
+        }
+        .icon-btn.active {
+            color: var(--primary-indigo);
+            background: #eff6ff;
+            border-radius: 12px;
+        }
+        .footer-link.active {
+            color: var(--primary-indigo);
+            font-weight: 700;
+        }
+        
+        /* ── Unified Navbar Responsiveness ── */
+        @media (max-width: 991px) {
+            .navbar {
+                padding: 0.75rem 0 !important;
+            }
+            .navbar-collapse {
+                background: #ffffff;
+                padding: 1.5rem;
+                border-radius: 20px;
+                border: 1px solid #f1f5f9;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+                margin-top: 0.75rem;
+                position: absolute;
+                top: 100%;
+                left: 10px;
+                right: 10px;
+                z-index: 1000;
+            }
+            .navbar-nav {
+                margin-bottom: 1.5rem;
+            }
+            .profile-nav-area {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 1rem !important;
+                padding-top: 1rem;
+                border-top: 1px solid #f1f5f9;
+            }
+            .btn-post {
+                width: 100%;
+                justify-content: center;
+                padding: 12px !important;
+            }
+            .icon-btn {
+                background: #f8fafc;
+                border-radius: 12px;
+                width: 100%;
+                padding: 10px 15px !important;
+                justify-content: flex-start !important;
+                display: flex;
+                align-items: center;
+                font-size: 1.1rem;
+            }
+        }
+
+        .btn-post {
+            background-color: var(--charcoal);
+            color: #fff !important;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-post:hover {
+            background-color: #000;
+            transform: translateY(-1px);
+        }
+
+        /* ── Uniform Components ── */
+        .card, .btn, .form-control {
+            border-radius: var(--border-radius) !important;
+        }
+        .card {
+            border: none !important;
+            box-shadow: var(--box-shadow);
+        }
+
+        .icon-btn {
+            color: var(--slate-gray);
+            font-size: 1.25rem;
+            padding: 8px;
+            cursor: pointer;
+            transition: color 0.2s;
+            position: relative;
+        }
+        .icon-btn:hover {
+            color: var(--primary-indigo);
+        }
+
+        /* ── Profile Area ── */
+        .profile-nav-text {
+            line-height: 1.2;
+            text-align: right;
+        }
+
+        /* ── Footer ── */
+        .footer-brand {
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.04em;
+        }
+        .footer-link {
+            color: var(--slate-gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .footer-link:hover {
+            color: var(--primary-indigo);
+        }
+        .footer-heading {
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+            color: var(--charcoal);
+        }
+
+        /* ── Utilities ── */
+        .text-soft { color: var(--slate-gray); }
+        .ls-1 { letter-spacing: 0.05em; }
+
+        /* ══════════════════════════════════════════
+           FIX #7 — USER DASHBOARD DARK MODE SYSTEM
+           ══════════════════════════════════════════ */
+        
+        /* Dark theme variable overrides */
+        body.dark-theme {
+            --primary-indigo: #60a5fa;   /* Lighter blue for dark bg */
+            --dark-indigo: #93c5fd;
+            --charcoal: #f0f0f0;
+            --slate-gray: #9ca3af;
+            --bg-light: #1a1a1a;
+            --box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+            background-color: #1a1a1a !important;
+            color: #f5f5f5 !important;
+        }
+
+        body.dark-theme .navbar {
+            background: #111111 !important;
+            border-bottom-color: #2d2d2d !important;
+        }
+        body.dark-theme .navbar-brand { color: #ffffff !important; }
+        body.dark-theme .nav-link { color: #9ca3af !important; }
+        body.dark-theme .nav-link:hover { color: #60a5fa !important; }
+
+        body.dark-theme .card,
+        body.dark-theme .product-card {
+            background: #242424 !important;
+            border-color: #333 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+        }
+
+        body.dark-theme footer {
+            background: #111111 !important;
+            border-top-color: #2d2d2d !important;
+        }
+
+        body.dark-theme .list-group-item {
+            background: #242424 !important;
+            color: #f5f5f5 !important;
+            border-color: #333 !important;
+        }
+        body.dark-theme .list-group-item:hover {
+            background: #2d2d2d !important;
+        }
+
+        body.dark-theme .modal-content {
+            background: #1e1e1e !important;
+            color: #f5f5f5 !important;
+        }
+
+        body.dark-theme .btn-light {
+            background: #2d2d2d !important;
+            color: #f5f5f5 !important;
+            border-color: #444 !important;
+        }
+
+        body.dark-theme .form-control,
+        body.dark-theme .form-select {
+            background: #2d2d2d !important;
+            color: #f5f5f5 !important;
+            border-color: #444 !important;
+        }
+
+        /* Dark mode toggle button in navbar */
+        #dark-mode-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 8px;
+            color: var(--slate-gray);
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        #dark-mode-toggle:hover { color: var(--primary-indigo); }
+    </style>
+</head>
+{# Prevent flash of wrong theme on reload - runs before body renders #}
+<script>
+    (function() {
+        if (localStorage.getItem('trollyfy-theme') === 'dark') {
+            document.documentElement.classList.add('preload-dark');
+            /* Architectural Standard Protocol: 
+               Setting data-bs-theme="dark" on the HTML root ensures Bootstrap 5 natively 
+               inverts text contrast (e.g. text-dark becomes light, text-muted becomes legible). */
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+        }
+    })();
+</script>
+<body>
+
+    <!-- ── Premium Navbar ── -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="app-container d-flex align-items-center justify-content-between">
+            <a class="navbar-brand" href="/">Trollyfy</a>
+            
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-lg-5 me-auto gap-1 gap-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">Browse Items</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#explore-categories">Browse Categories</a>
+                    </li>
+                </ul>
+
+                <div class="profile-nav-area d-flex align-items-center gap-3">
+                    <!-- Global Icons -->
+                    <div class="d-flex gap-2 me-0 me-lg-2">
+                        <a href="{% url 'wishlist' %}" class="icon-btn text-decoration-none {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}" title="My Wishlist">
+                            <i class="bi bi-heart{% if request.resolver_match.url_name == 'wishlist' %}-fill{% endif %}"></i>
+                            <span class="d-lg-none ms-2 small fw-medium">Wishlist</span>
+                        </a>
+                        <a href="{% url 'conversations' %}" class="icon-btn text-decoration-none {% if request.resolver_match.url_name == 'conversations' or request.resolver_match.url_name == 'chat_room' %}active{% endif %}" title="Messages">
+                            <i class="bi bi-chat-dots{% if request.resolver_match.url_name == 'conversations' or request.resolver_match.url_name == 'chat_room' %}-fill{% endif %}"></i>
+                            <span class="d-lg-none ms-2 small fw-medium">Messages</span>
+                        </a>
+                        <a href="{% url 'report_system' %}" class="icon-btn text-decoration-none {% if request.resolver_match.url_name == 'report_system' %}active{% endif %}" title="Report System Issue">
+                            <i class="bi bi-flag{% if request.resolver_match.url_name == 'report_system' %}-fill{% endif %}"></i>
+                            <span class="d-lg-none ms-2 small fw-medium">Report Issue</span>
+                        </a>
+                    </div>
+
+                    {# FIX #7: Dark Mode Toggle Button #}
+                    <button id="dark-mode-toggle" title="Toggle Dark Mode" aria-label="Toggle dark mode">
+                        <i class="bi bi-moon-stars" id="dark-mode-icon"></i>
+                    </button>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'listing_create' %}" class="btn btn-post d-inline-flex">
+                            <i class="bi bi-plus-lg me-1"></i> Post Item
+                        </a>
+                        
+                        <div class="d-flex align-items-center ms-lg-2">
+                            <div class="profile-nav-text me-2">
+                                <div class="fw-bold small text-dark">Hi, {{ user.username }}</div>
+                                <button type="button" class="btn btn-link p-0 text-secondary small text-decoration-none" data-bs-toggle="modal" data-bs-target="#logoutModal" style="line-height:1;">Logout</button>
+                            </div>
+                            <a href="{% url 'profile' %}" class="text-decoration-none">
+                                {% if user.profile_picture %}
+                                    <img src="{{ user.profile_picture.url }}" class="rounded-circle border" width="40" height="40" style="object-fit:cover;">
+                                {% else %}
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border text-dark" style="width:40px;height:40px;font-weight:700;">
+                                        {{ user.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                            </a>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="nav-link fw-bold px-3">Login</a>
+                        <a href="{% url 'signup' %}" class="btn btn-post px-4">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── Logout Modal ── -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <div class="text-center p-5">
+                    <div class="mb-3" style="font-size: 3.5rem; line-height:1;"><i class="bi bi-box-arrow-right text-secondary"></i></div>
+                    <h5 class="fw-bold mb-1" id="logoutModalLabel">Ready to leave?</h5>
+                    <p class="text-muted small mb-4">You'll be signed out of your Trollyfy session.</p>
+                    <div class="d-grid gap-2">
+                        <!-- POST form submits on button click — required for Django 4.1+ logout -->
+                        <form action="{% url 'logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold" style="border-radius: 50px;">Yes, Logout</button>
+                        </form>
+                        <button type="button" class="btn btn-light btn-lg fw-bold" style="border-radius: 50px;" data-bs-dismiss="modal">Stay logged in</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Content Area ── -->
+    <main>
+        <div class="app-container mt-4">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <div class="app-container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- ── Rich Footer ── -->
+    <footer class="bg-white pt-5 pb-4 mt-5 border-top">
+        <div class="app-container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-brand mb-3">Trollyfy</div>
+                    <p class="text-soft small pe-lg-5">
+                        Revolutionizing campus commerce. Buy, sell, and connect with your peers safely and easily. Built for students, by students.
+                    </p>
+                    <div class="mt-4 d-flex gap-3">
+                        <i class="bi bi-globe icon-btn p-0 fs-5"></i>
+                        <i class="bi bi-at icon-btn p-0 fs-5"></i>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-lg-2 ms-lg-auto">
+                    <div class="footer-heading">Platform</div>
+                    <ul class="list-unstyled d-grid gap-2">
+                        <li><a href="{% url 'about_us' %}" class="footer-link {% if request.resolver_match.url_name == 'about_us' %}active{% endif %}">About Us</a></li>
+                        <li><a href="{% url 'our_team' %}" class="footer-link {% if request.resolver_match.url_name == 'our_team' %}active{% endif %}">Our Team</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-4 col-lg-2">
+                    <div class="footer-heading">Legal</div>
+                    <ul class="list-unstyled d-grid gap-2">
+                        <li><a href="{% url 'terms' %}" class="footer-link {% if request.resolver_match.url_name == 'terms' %}active{% endif %}">Terms of Service</a></li>
+                        <li><a href="{% url 'privacy' %}" class="footer-link {% if request.resolver_match.url_name == 'privacy' %}active{% endif %}">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-4 col-lg-2">
+                    <div class="footer-heading">Support</div>
+                    <ul class="list-unstyled d-grid gap-2">
+                        <li><a href="#" class="footer-link">Help Center</a></li>
+                        <li><a href="{% url 'report_system' %}" class="footer-link {% if request.resolver_match.url_name == 'report_system' %}active{% endif %}">Report Issue</a></li>
+                    </ul>
+                </div>
+        </div>
+    </footer>
+
+    <!-- ── Toast Container ── -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000; margin-top: 20px;">
+        <div id="liveToast" class="toast align-items-center text-white bg-dark border-0 rounded-4 shadow-lg" role="alert">
+            <div class="d-flex p-2">
+                <div class="toast-body fw-medium" id="toast-message"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        /* ── Toast Utility ── */
+        function showToast(message) {
+            const toastEl = document.getElementById('liveToast');
+            const messageEl = document.getElementById('toast-message');
+            messageEl.textContent = message;
+            const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+            toast.show();
+        }
+
+        /* ── FIX #7: Dark Mode Toggle Logic ── */
+        (function () {
+            const btn = document.getElementById('dark-mode-toggle');
+            const icon = document.getElementById('dark-mode-icon');
+            const body = document.body;
+            const STORAGE_KEY = 'trollyfy-theme';
+
+            function applyTheme(dark) {
+                if (dark) {
+                    body.classList.add('dark-theme');
+                    /* Architectural Standard Protocol: Activate Bootstrap native dark mode context */
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
+                    icon.className = 'bi bi-sun';
+                } else {
+                    body.classList.remove('dark-theme');
+                    /* Architectural Standard Protocol: Revert to Bootstrap native light mode */
+                    document.documentElement.removeAttribute('data-bs-theme');
+                    icon.className = 'bi bi-moon-stars';
+                }
+            }
+
+            /* Apply saved preference immediately */
+            const saved = localStorage.getItem(STORAGE_KEY);
+            applyTheme(saved === 'dark');
+
+            if (btn) {
+                btn.addEventListener('click', function () {
+                    const isDark = body.classList.contains('dark-theme');
+                    applyTheme(!isDark);
+                    localStorage.setItem(STORAGE_KEY, isDark ? 'light' : 'dark');
+                });
+            }
+        })();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

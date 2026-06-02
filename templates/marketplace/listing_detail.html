@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ listing.title }} | Trollyfy{% endblock %}
+
+{% block content %}
+<style>
+    /* ── Product Page Specific Layout ── */
+    .product-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    @media (min-width: 992px) {
+        .product-grid {
+            grid-template-columns: 65% 35%;
+            gap: 2.5rem;
+            align-items: start;
+        }
+        .main-media { grid-column: 1; grid-row: 1; }
+        .main-sidebar { grid-column: 2; grid-row: 1 / span 2; position: sticky; top: 100px; }
+        .main-description { grid-column: 1; grid-row: 2; }
+    }
+
+    /* ── Component Refinement ── */
+    .breadcrumb { margin-bottom: 2rem; padding-left: 0; }
+    .breadcrumb-item a { color: var(--primary-indigo); font-weight: 500; }
+    
+    .product-card {
+        background: #fff;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        border: none;
+    }
+
+    .price-card {
+        background: var(--primary-indigo);
+        color: #fff;
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+    }
+
+    .btn-chat {
+        background: var(--primary-indigo);
+        border: none;
+        transition: background 0.2s;
+    }
+    .btn-chat:hover { background: var(--dark-indigo); }
+
+    .safety-alert {
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        color: #92400e;
+    }
+</style>
+
+<!-- Breadcrumb Navigation -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'index' %}" class="text-decoration-none">Marketplace</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'index' %}?category={{ listing.category }}" class="text-decoration-none">{{ listing.get_category_display }}</a></li>
+        <li class="breadcrumb-item active text-muted" aria-current="page">{{ listing.title|truncatechars:20 }}</li>
+    </ol>
+</nav>
+
+<div class="product-grid">
+    <!-- 1. IMAGE GALLERY (Desktop: Left, Mobile: Top) -->
+    <div class="main-media">
+        <div id="itemCarousel" class="carousel slide product-card bg-white" data-bs-ride="false">
+            {% if listing.images.count > 0 %}
+            <div class="position-absolute top-0 start-0 m-3 z-3">
+                <span class="badge bg-dark bg-opacity-50 rounded-pill px-3 py-2 fw-bold" id="carousel-counter">
+                    1 / {{ listing.images.count }}
+                </span>
+            </div>
+            {% endif %}
+
+            <div class="carousel-inner">
+                {% if listing.images.all %}
+                    {% for img in listing.images.all %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ img.image.url }}" class="d-block w-100" style="height: 500px; object-fit: contain;" alt="{{ listing.title }}">
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="carousel-item active">
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 500px;">
+                            <p class="text-muted fs-4">No Photos Available</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if listing.images.count > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#itemCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true" style="padding: 1.5rem;"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#itemCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true" style="padding: 1.5rem;"></span>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 2. SIDEBAR (Desktop: Right, Mobile: Middle) -->
+    <div class="main-sidebar">
+        <!-- Price Card -->
+        <div class="product-card price-card mb-4 position-relative">
+            {% if user.is_authenticated %}
+                <div class="position-absolute top-0 end-0 m-3 wishlist-toggle" data-id="{{ listing.pk }}" style="cursor: pointer; font-size: 1.5rem;">
+                    <i class="bi {% if listing.pk in user_wishlist %}bi-heart-fill text-danger{% else %}bi-heart{% endif %}" id="wishlist-icon"></i>
+                </div>
+            {% else %}
+                <div class="position-absolute top-0 end-0 m-3" style="cursor: pointer; font-size: 1.5rem;" onclick="showToast('Please login into the system for adding the item to the wishlist')">
+                    <i class="bi bi-heart"></i>
+                </div>
+            {% endif %}
+            <div class="small opacity-75 mb-1">Campus Listing Price</div>
+            <div class="display-4 fw-bold">${{ listing.price }}</div>
+        </div>
+
+        <!-- Seller Profile Card -->
+        <div class="product-card p-4 mb-4">
+            <h6 class="fw-bold mb-4 text-uppercase ls-1 text-soft small">Meet the Seller</h6>
+            <div class="d-flex align-items-center mb-4">
+                {% if listing.seller.profile_picture %}
+                    <img src="{{ listing.seller.profile_picture.url }}" class="rounded-circle border me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                {% else %}
+                    <div class="avatar-sm bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-weight: bold;">
+                        {{ listing.seller.username|first|upper }}
+                    </div>
+                {% endif %}
+                <div>
+                    <h6 class="fw-bold mb-0 text-dark">{{ listing.seller.get_full_name|default:listing.seller.username }}</h6>
+                    <small class="text-soft">Verified Student</small>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                {% if user.is_authenticated %}
+                    {% if user != listing.seller %}
+                        <a href="{% url 'initiate_chat' listing.pk %}" class="btn btn-chat btn-lg text-white fw-bold py-3">
+                            <i class="bi bi-chat-fill me-2"></i> Chat with Seller
+                        </a>
+                    {% else %}
+                        <a href="{% url 'listing_update' listing.pk %}" class="btn btn-warning btn-lg fw-bold py-3">
+                            <i class="bi bi-pencil-square me-2"></i> Edit My Listing
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-chat btn-lg text-white fw-bold py-3">
+                        Log in to Chat
+                    </a>
+                {% endif %}
+                
+                <a href="mailto:{{ listing.seller.email }}" class="btn btn-outline-secondary btn-lg fw-bold py-3 border-2">
+                    Contact via Email
+                </a>
+            </div>
+        </div>
+
+        <!-- Safety Disclaimer -->
+        <div class="product-card padding p-4 safety-alert">
+            <h6 class="fw-bold mb-2"><i class="bi bi-shield-check me-2"></i>Safety First</h6>
+            <p class="small mb-0 opacity-90">Trollyfy is a campus connection platform. For your safety, always meet in public university locations and inspect items before payment.</p>
+            
+            {% if user.is_authenticated and user != listing.seller %}
+                <hr class="opacity-10 my-3">
+                <a href="{% url 'report_listing' listing.pk %}" class="text-danger small text-decoration-none fw-bold">
+                    <i class="bi bi-flag-fill me-1"></i> Report Suspicious Activity
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 3. DESCRIPTION (Desktop: Left Bottom, Mobile: Bottom) -->
+    <div class="main-description">
+        <div class="product-card p-4 p-md-5">
+            <h4 class="fw-bold mb-4">Item Description</h4>
+            <p class="lead text-dark opacity-75 mb-5" style="white-space: pre-line; font-size: 1.1rem;">{{ listing.description }}</p>
+            
+            <div class="pt-4 border-top">
+                <div class="row g-4">
+                    <div class="col-sm-6">
+                        <small class="text-soft text-uppercase fw-bold ls-1 d-block mb-1">Condition</small>
+                        <span class="badge bg-light text-dark border px-3 py-2 fw-semibold">{{ listing.get_condition_display }}</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <small class="text-soft text-uppercase fw-bold ls-1 d-block mb-1">Listed On</small>
+                        <span class="fw-bold text-dark">{{ listing.created_at|date:"F d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const carouselEl = document.getElementById('itemCarousel');
+    const counterEl = document.getElementById('carousel-counter');
+    const totalItems = parseInt("{{ listing.images.count|default:0 }}");
+
+    if (carouselEl && counterEl && totalItems > 0) {
+        carouselEl.addEventListener('slide.bs.carousel', function (event) {
+            const nextIndex = event.to + 1;
+            counterEl.textContent = nextIndex + ' / ' + totalItems;
+        });
+    }
+    // Wishlist Toggle (AJAX)
+    document.querySelectorAll('.wishlist-toggle').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const listingId = this.dataset.id;
+            const icon = this.querySelector('i');
+            
+            fetch(`/wishlist/toggle/${listingId}/`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'added') {
+                    icon.classList.replace('bi-heart', 'bi-heart-fill');
+                    icon.classList.add('text-danger');
+                    showToast('Item added to your wishlist!');
+                } else {
+                    icon.classList.replace('bi-heart-fill', 'bi-heart');
+                    icon.classList.remove('text-danger');
+                    showToast('Item removed from your wishlist');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

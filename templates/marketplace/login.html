@@ -1,0 +1,422 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login | Trollyfy — Campus Marketplace{% endblock %}
+
+{% block content %}
+<!-- Override base padding for a full-bleed auth layout -->
+<style>
+    /* ── Page Reset ─────────────────────────────────────────────────────── */
+    main.container { max-width: 100% !important; padding: 0 !important; }
+
+    /* ── Auth Wrapper ───────────────────────────────────────────────────── */
+    .auth-wrapper {
+        min-height: calc(100vh - 76px);
+        display: flex;
+        align-items: stretch;
+    }
+
+    /* ── Left Panel (Branding) ──────────────────────────────────────────── */
+    .auth-brand-panel {
+        width: 45%;
+        background: linear-gradient(160deg, #0f2f6b 0%, #1a56db 55%, #60a5fa 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .auth-brand-panel::before {
+        content: '';
+        position: absolute;
+        width: 350px; height: 350px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        top: -80px; left: -80px;
+    }
+    .auth-brand-panel::after {
+        content: '';
+        position: absolute;
+        width: 250px; height: 250px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        bottom: -60px; right: -60px;
+    }
+    .brand-logo-circle {
+        width: 88px; height: 88px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.5rem;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255,255,255,0.25);
+        margin-bottom: 1.5rem;
+    }
+    .brand-tagline {
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.7);
+        line-height: 1.7;
+        max-width: 280px;
+    }
+    .brand-feature {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        color: rgba(255,255,255,0.85);
+        font-size: 0.875rem;
+    }
+    .brand-feature .feature-icon {
+        width: 32px; height: 32px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+
+    /* ── Right Panel (Form) ─────────────────────────────────────────────── */
+    .auth-form-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 3rem 4rem;
+        background: #ffffff;
+        overflow-y: auto;
+    }
+    .auth-form-panel .form-header {
+        margin-bottom: 2rem;
+    }
+
+    /* ── Form Controls ──────────────────────────────────────────────────── */
+    .form-floating-custom {
+        position: relative;
+        margin-bottom: 1.25rem;
+    }
+    .form-floating-custom label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.4rem;
+    }
+    .auth-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        color: #1e293b;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+        outline: none;
+    }
+    .auth-input:focus {
+        border-color: #4f46e5;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+    }
+    .auth-input.is-invalid {
+        border-color: #ef4444 !important;
+        background: #fff5f5;
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.08) !important;
+    }
+    .auth-input.is-valid {
+        border-color: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.08);
+    }
+    .field-wrapper {
+        position: relative;
+    }
+    /* Password visibility toggle button */
+    .pw-toggle {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s;
+        border-radius: 6px;
+    }
+    .pw-toggle:hover { color: #4f46e5; background: rgba(79,70,229,0.08); }
+    .pw-toggle svg { pointer-events: none; }
+
+    /* ── Error Banner ───────────────────────────────────────────────────── */
+    .error-banner {
+        display: none;
+        padding: 0.75rem 1rem;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-left: 4px solid #ef4444;
+        border-radius: 10px;
+        margin-bottom: 1.25rem;
+        font-size: 0.875rem;
+        color: #991b1b;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .error-banner.show { display: flex; animation: slideDown 0.25s ease; }
+
+    /* ── Submit Button ──────────────────────────────────────────────────── */
+    .btn-auth {
+        width: 100%;
+        padding: 0.875rem;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+    }
+    .btn-auth:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 25px rgba(79, 70, 229, 0.35);
+    }
+    .btn-auth:active { transform: translateY(0); }
+    .btn-auth:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    /* ── Divider ────────────────────────────────────────────────────────── */
+    .auth-divider {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #94a3b8;
+        font-size: 0.875rem;
+    }
+    .auth-divider a {
+        color: #4f46e5;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .auth-divider a:hover { text-decoration: underline; }
+
+    /* ── Animations ─────────────────────────────────────────────────────── */
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        20%      { transform: translateX(-10px); }
+        40%      { transform: translateX(10px); }
+        60%      { transform: translateX(-6px); }
+        80%      { transform: translateX(6px); }
+    }
+    .shake { animation: shake 0.4s ease; }
+
+    /* ── Responsive Collapse ────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+        .auth-brand-panel { display: none; }
+        .auth-form-panel  { padding: 2rem 1.5rem; }
+    }
+</style>
+
+<!-- Bootstrap Icons CDN for proper SVG eye icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<div class="auth-wrapper">
+
+    <!-- ── Left Branding Panel ─────────────────────────────────────────── -->
+    <div class="auth-brand-panel">
+        <!-- Glassmorphism flexbox card containing all brand content -->
+        <div style="
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 340px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        ">
+            <div class="brand-logo-circle">
+                <i class="bi bi-bag-heart-fill" style="color:white; font-size:2rem;"></i>
+            </div>
+            <h2 style="color:white; font-weight:800; font-size:1.75rem; margin-bottom:0.5rem;">
+                Trollyfy.com
+            </h2>
+            <p class="brand-tagline">
+                The official campus marketplace for verified Holmes Institute students.
+            </p>
+
+            <div class="brand-feature mt-4 justify-content-center">
+                <div class="feature-icon"><i class="bi bi-shield-check" style="color:white;"></i></div>
+                <span>Verified university emails only</span>
+            </div>
+            <div class="brand-feature justify-content-center">
+                <div class="feature-icon"><i class="bi bi-tag" style="color:white;"></i></div>
+                <span>Buy & sell campus essentials</span>
+            </div>
+            <div class="brand-feature justify-content-center">
+                <div class="feature-icon"><i class="bi bi-people" style="color:white;"></i></div>
+                <span>Connect with your peers</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Right Form Panel ────────────────────────────────────────────── -->
+    <div class="auth-form-panel">
+        <div style="max-width: 400px; width: 100%; margin: 0 auto;">
+
+            <div class="form-header">
+                <h2 style="font-weight:800; color:#1e293b; margin-bottom:0.25rem;">Welcome back</h2>
+                <p style="color:#64748b; font-size:0.95rem; margin:0;">Sign in to your campus marketplace account</p>
+            </div>
+
+            <form method="post" id="login-form" novalidate>
+                {% csrf_token %}
+
+                <!-- Inline error banner — shown by JS on failed login -->
+                <div class="error-banner" id="login-error-banner" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;"></i>
+                    <span id="login-error-message">Invalid username or password.</span>
+                </div>
+
+                <!-- Username Field -->
+                <div class="form-floating-custom">
+                    <label for="id_username">Username</label>
+                    <div class="field-wrapper">
+                        <input type="text" name="username" id="id_username"
+                               class="auth-input" placeholder="Enter your username"
+                               autocomplete="username" autofocus required>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-floating-custom">
+                    <label for="id_password">Password</label>
+                    <div class="field-wrapper">
+                        <input type="password" name="password" id="id_password"
+                               class="auth-input" placeholder="Enter your password"
+                               style="padding-right: 3rem;"
+                               autocomplete="current-password" required>
+                        <!-- Bootstrap Icons: bi-eye / bi-eye-slash -->
+                        <button type="button" class="pw-toggle" id="toggle-pw"
+                                aria-label="Show or hide password">
+                            <i class="bi bi-eye" id="pw-icon" style="font-size:1.1rem;"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-auth" id="login-btn">
+                    <span id="btn-text">Sign In</span>
+                    <span id="btn-spinner" class="spinner-border spinner-border-sm" style="display:none;"></span>
+                </button>
+            </form>
+
+            <div class="auth-divider">
+                Don't have an account? <a href="{% url 'signup' %}">Join Trollyfy</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * AJAX Login Handler
+ * Intercepts form submission, sends credentials via Fetch API.
+ * On 401 JSON response → shows inline error banner (no page reload).
+ * On success redirect → follows the redirect normally.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    const form        = document.getElementById('login-form');
+    const errorBanner = document.getElementById('login-error-banner');
+    const errorMsg    = document.getElementById('login-error-message');
+    const loginBtn    = document.getElementById('login-btn');
+    const btnText     = document.getElementById('btn-text');
+    const btnSpinner  = document.getElementById('btn-spinner');
+    const pwInput     = document.getElementById('id_password');
+    const usernameInput = document.getElementById('id_username');
+    const toggleBtn   = document.getElementById('toggle-pw');
+    const pwIcon      = document.getElementById('pw-icon');
+
+    /* ── Password Visibility Toggle ────────────────────────────────────── */
+    toggleBtn.addEventListener('click', function () {
+        const isHidden = pwInput.type === 'password';
+        pwInput.type = isHidden ? 'text' : 'password';
+        // Swap between Bootstrap Icon classes
+        pwIcon.className = isHidden ? 'bi bi-eye-slash' : 'bi bi-eye';
+        pwIcon.style.fontSize = '1.1rem';
+    });
+
+    /* ── Clear error state on typing ───────────────────────────────────── */
+    [usernameInput, pwInput].forEach(inp => {
+        inp.addEventListener('input', function () {
+            errorBanner.classList.remove('show');
+            inp.classList.remove('is-invalid');
+        });
+    });
+
+    /* ── AJAX Form Submit ───────────────────────────────────────────────── */
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        loginBtn.disabled = true;
+        btnText.textContent = 'Signing in…';
+        btnSpinner.style.display = 'inline-block';
+        errorBanner.classList.remove('show');
+
+        fetch(form.action || window.location.href, {
+            method: 'POST',
+            body: new FormData(form),
+            redirect: 'follow',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(res => {
+            if (res.ok && res.redirected) {
+                window.location.href = res.url; // Successful login
+            } else if (res.status === 401) {
+                res.json().then(data => showError(data.error || 'Invalid credentials.'));
+            } else if (res.ok) {
+                window.location.href = res.url || '/';
+            } else {
+                showError('Something went wrong. Please try again.');
+            }
+        })
+        .catch(() => showError('Network error. Please check your connection.'))
+        .finally(() => {
+            loginBtn.disabled = false;
+            btnText.textContent = 'Sign In';
+            btnSpinner.style.display = 'none';
+        });
+    });
+
+    function showError(msg) {
+        errorMsg.textContent = msg;
+        errorBanner.classList.add('show');
+        usernameInput.classList.add('is-invalid');
+        pwInput.classList.add('is-invalid');
+        pwInput.value = '';
+        // Shake the form panel
+        const panel = document.querySelector('.auth-form-panel > div');
+        panel.classList.remove('shake');
+        void panel.offsetWidth; // reflow
+        panel.classList.add('shake');
+        setTimeout(() => panel.classList.remove('shake'), 500);
+        usernameInput.focus();
+    }
+});
+</script>
+{% endblock %}

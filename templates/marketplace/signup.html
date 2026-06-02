@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Join Trollyfy | Create Your Account{% endblock %}
+
+{% block content %}
+<style>
+    /* ── Page Reset ─────────────────────────────────────────────────────── */
+    main.container { max-width: 100% !important; padding: 0 !important; }
+
+    /* ── Auth Wrapper ───────────────────────────────────────────────────── */
+    .auth-wrapper {
+        min-height: calc(100vh - 76px);
+        display: flex;
+        align-items: stretch;
+    }
+
+    /* ── Left Panel (Branding) ──────────────────────────────────────────── */
+    .auth-brand-panel {
+        width: 45%;
+        background: linear-gradient(160deg, #0f2f6b 0%, #1a56db 55%, #60a5fa 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+        color: white;
+    }
+    .auth-brand-panel::before {
+        content: '';
+        position: absolute;
+        width: 350px; height: 350px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        top: -80px; left: -80px;
+    }
+    .auth-brand-panel::after {
+        content: '';
+        position: absolute;
+        width: 250px; height: 250px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        bottom: -60px; right: -60px;
+    }
+    .brand-logo-circle {
+        width: 88px; height: 88px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.5rem;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255,255,255,0.25);
+        margin-bottom: 1.5rem;
+    }
+    .brand-tagline {
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.7);
+        line-height: 1.7;
+        max-width: 280px;
+    }
+    .brand-feature {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        color: rgba(255,255,255,0.85);
+        font-size: 0.875rem;
+    }
+    .brand-feature .feature-icon {
+        width: 32px; height: 32px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    /* ── Right Panel (Form) ─────────────────────────────────────────────── */
+    .auth-form-panel {
+        flex: 1;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 4rem 10%;
+        overflow-y: auto;
+    }
+
+    /* ── Input Styling ──────────────────────────────────────────────────── */
+    .form-group-custom { margin-bottom: 1.5rem; position: relative; }
+    .form-label { font-weight: 600; color: #475569; font-size: 0.875rem; margin-bottom: 0.5rem; display: block; }
+    .auth-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+    }
+    .auth-input:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+    .pw-wrapper { position: relative; }
+    .pw-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+    }
+    .pw-toggle:hover { color: #6366f1; }
+
+    /* ── Strength Checker ───────────────────────────────────────────────── */
+    #password-checker {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 0.75rem;
+    }
+    .pw-rule { font-size: 0.8rem; color: #64748b; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
+    .pw-rule i { font-size: 0.9rem; }
+    .pw-rule.met { color: #10b981; }
+    .pw-rule.failed { color: #ef4444; }
+
+    .btn-auth {
+        width: 100%;
+        padding: 0.875rem;
+        background: #6366f1;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        transition: all 0.2s;
+        margin-top: 1rem;
+    }
+    .btn-auth:hover { background: #4f46e5; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+
+    @media (max-width: 991px) {
+        .auth-brand-panel { display: none; }
+        .auth-form-panel { padding: 3rem 1.5rem; }
+    }
+</style>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<div class="auth-wrapper">
+    <!-- Left Panel — Glassmorphism Flexbox Card -->
+    <div class="auth-brand-panel">
+        <div style="
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 340px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        ">
+            <div class="brand-logo-circle">
+                <i class="bi bi-bag-heart-fill" style="color:white; font-size:2rem;"></i>
+            </div>
+            <h2 style="color:white; font-weight:800; font-size:1.75rem; margin-bottom:0.5rem;">
+                Trollyfy.com
+            </h2>
+            <p class="brand-tagline">
+                The official campus marketplace for verified Holmes Institute students.
+            </p>
+            <hr style="border-color:rgba(255,255,255,0.25); width:100%; margin: 1.25rem 0;">
+            <div class="brand-feature">
+                <div class="feature-icon"><i class="bi bi-shield-check" style="color:white;"></i></div>
+                <span>Verified university emails only</span>
+            </div>
+            <div class="brand-feature">
+                <div class="feature-icon"><i class="bi bi-tag" style="color:white;"></i></div>
+                <span>Buy &amp; sell campus essentials</span>
+            </div>
+            <div class="brand-feature">
+                <div class="feature-icon"><i class="bi bi-people" style="color:white;"></i></div>
+                <span>Connect with your peers</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="auth-form-panel">
+        <div style="max-width: 480px; width: 100%; margin: 0 auto;">
+            <div class="mb-4">
+                <h2 class="fw-bold text-dark">Create Account</h2>
+                <p class="text-muted">Start your journey on the campus marketplace today.</p>
+            </div>
+
+            <form method="post" id="signup-form" novalidate>
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="form-group-custom">
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        
+                        {% if field.html_name == 'password1' or field.html_name == 'password2' %}
+                            <div class="pw-wrapper">
+                                <input type="password" name="{{ field.html_name }}" id="{{ field.id_for_label }}" 
+                                       class="auth-input {% if field.errors %}is-invalid{% endif %}"
+                                       placeholder="Enter {{ field.label|lower }}">
+                                <button type="button" class="pw-toggle" onclick="togglePassword('{{ field.id_for_label }}', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        {% else %}
+                            <input type="{{ field.field.widget.input_type|default:'text' }}" 
+                                   name="{{ field.html_name }}" id="{{ field.id_for_label }}"
+                                   value="{{ field.value|default:'' }}"
+                                   class="auth-input {% if field.errors %}is-invalid{% endif %}"
+                                   placeholder="Enter {{ field.label|lower }}">
+                        {% endif %}
+
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="bi bi-exclamation-circle me-1"></i> {{ field.errors|striptags }}
+                            </div>
+                        {% endif %}
+
+                        {# Password Strength UI #}
+                        {% if field.html_name == 'password1' %}
+                            <div id="password-checker">
+                                <p class="text-muted small fw-bold mb-2">Password Requirements:</p>
+                                <div class="pw-rule" id="rule-length"><i class="bi bi-circle"></i> 8+ characters</div>
+                                <div class="pw-rule" id="rule-uppercase"><i class="bi bi-circle"></i> An uppercase letter</div>
+                                <div class="pw-rule" id="rule-lowercase"><i class="bi bi-circle"></i> A lowercase letter</div>
+                                <div class="pw-rule" id="rule-digit"><i class="bi bi-circle"></i> A number</div>
+                                
+                                <div class="progress mt-3" style="height: 6px;">
+                                    <div id="strength-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small id="strength-label" class="text-muted d-block mt-1" style="font-size: 0.75rem;"></small>
+                            </div>
+                        {% endif %}
+
+                        {# Password Match UI #}
+                        {% if field.html_name == 'password2' %}
+                            <div id="match-feedback" class="small mt-1" style="display:none;"></div>
+                        {% endif %}
+
+                        {% if field.help_text and field.html_name != 'password1' %}
+                            <div class="form-text text-muted small">{{ field.help_text }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn-auth">Register Now</button>
+            </form>
+
+            <div class="text-center mt-4 pt-2">
+                <span class="text-muted small">Already a member?</span>
+                <a href="{% url 'login' %}" class="text-primary fw-bold text-decoration-none small ms-1">Sign In</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('bi-eye', 'bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('bi-eye-slash', 'bi-eye');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const pw1 = document.getElementById('id_password1');
+        const pw2 = document.getElementById('id_password2');
+        const strengthBar = document.getElementById('strength-bar');
+        const strengthLabel = document.getElementById('strength-label');
+        const matchFeedback = document.getElementById('match-feedback');
+
+        function validateRule(id, met) {
+            const el = document.getElementById(id);
+            const icon = el.querySelector('i');
+            el.classList.remove('met', 'failed');
+            icon.className = 'bi bi-circle';
+            
+            if (met) {
+                el.classList.add('met');
+                icon.className = 'bi bi-check-circle-fill';
+            } else if (pw1.value.length > 0) {
+                el.classList.add('failed');
+                icon.className = 'bi bi-x-circle-fill';
+            }
+        }
+
+        if (pw1) {
+            pw1.addEventListener('input', function () {
+                const val = pw1.value;
+                const rules = {
+                    'rule-length': val.length >= 8,
+                    'rule-uppercase': /[A-Z]/.test(val),
+                    'rule-lowercase': /[a-z]/.test(val),
+                    'rule-digit': /[0-9]/.test(val)
+                };
+
+                let metCount = 0;
+                Object.entries(rules).forEach(([id, met]) => {
+                    validateRule(id, met);
+                    if (met) metCount++;
+                });
+
+                const strength = (metCount / 4) * 100;
+                strengthBar.style.width = strength + '%';
+                
+                if (strength <= 25) { strengthBar.className = 'progress-bar bg-danger'; strengthLabel.textContent = 'Weak'; }
+                else if (strength <= 75) { strengthBar.className = 'progress-bar bg-warning'; strengthLabel.textContent = 'Moderate'; }
+                else { strengthBar.className = 'progress-bar bg-success'; strengthLabel.textContent = 'Strong'; }
+
+                if (pw2 && pw2.value) checkMatch();
+            });
+        }
+
+        function checkMatch() {
+            if (!pw2 || !matchFeedback) return;
+            matchFeedback.style.display = 'block';
+            if (pw1.value === pw2.value && pw1.value !== '') {
+                matchFeedback.innerHTML = '<i class="bi bi-check-circle-fill"></i> Passwords match';
+                matchFeedback.className = 'small mt-1 text-success';
+            } else {
+                matchFeedback.innerHTML = '<i class="bi bi-x-circle-fill"></i> Passwords do not match';
+                matchFeedback.className = 'small mt-1 text-danger';
+            }
+        }
+
+        if (pw2) pw2.addEventListener('input', checkMatch);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Your Email | Trollyfy{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-7 col-lg-6 text-center">
+        <div class="card shadow-sm border-0 rounded-4 p-5">
+            <div class="mb-4">
+                <span class="display-1 text-primary">📩</span>
+            </div>
+            <h2 class="fw-bold mb-3">Check Your Inbox</h2>
+            <p class="text-muted lead mb-4">
+                We've sent an activation link to your university email address. 
+                Please click the link in that email to verify your identity and start trading on Trollyfy.
+            </p>
+            <div class="alert alert-info border-0 rounded-3 mb-4">
+                <small><strong>Tip:</strong> If you don't see the email, check your spam folder.</small>
+            </div>
+            <a href="{% url 'login' %}" class="btn btn-outline-primary rounded-pill px-4">Back to Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

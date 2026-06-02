@@ -1,0 +1,300 @@
+/*
+ * Trollyfy Admin Console - Custom Overrides
+ * Safe overrides that work WITH Django Admin's float-based layout.
+ */
+
+/* ════════════════════════════════════════════
+   1. ADMIN HEADER NAVBAR (User Tools)
+   ════════════════════════════════════════════ */
+#user-tools {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px;
+}
+
+#user-tools a,
+#user-tools strong {
+    display: inline-block !important;
+    padding: 5px 12px !important;
+    border-radius: 4px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    text-decoration: none !important;
+    transition: background 0.2s ease !important;
+    white-space: nowrap !important;
+    border: 1px solid rgba(255,255,255,0.25) !important;
+    background-color: rgba(255,255,255,0.12) !important;
+    color: #ffffff !important;
+}
+
+#user-tools a:hover {
+    background-color: rgba(255,255,255,0.28) !important;
+}
+
+/* "Change Password" — blue */
+#user-tools a[href*="password"] {
+    background-color: #2563eb !important;
+    border-color: #1d4ed8 !important;
+}
+
+/* "Log Out" — red */
+#user-tools a[href*="logout"] {
+    background-color: #dc2626 !important;
+    border-color: #b91c1c !important;
+}
+
+/* "View Site" — green */
+#user-tools a[href="/"] {
+    background-color: #16a34a !important;
+    border-color: #15803d !important;
+}
+
+
+/* ════════════════════════════════════════════
+   2. DASHBOARD FULL-WIDTH LAYOUT
+   Expands the content wrapper and makes the
+   left modules + right sidebar fill the page
+   using Django Admin's own float system.
+   ════════════════════════════════════════════ */
+
+/* Remove the default max-width cap on the outer wrapper, EXCEPT on login page */
+body:not(.login) #container,
+body:not(.login) #main,
+body:not(.login) #content-main {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* The main content div (holds .colMS + .colSM) */
+body:not(.login) #content {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 20px 30px !important;
+    box-sizing: border-box !important;
+}
+
+/* ── Dashboard: Left column (app module tables) ──
+   Django admin gives this ~65%. We stretch it. */
+.dashboard .colMS {
+    float: left !important;
+    width: 66% !important;
+    padding-right: 20px !important;
+    box-sizing: border-box !important;
+}
+
+/* ── Dashboard: Right column (Recent Actions) ──
+   Django admin gives this ~33%. We align it right. */
+.dashboard .colSM,
+.dashboard #recent-actions-module {
+    float: right !important;
+    width: 30% !important;
+    box-sizing: border-box !important;
+}
+
+/* ── Make each module table fill its column width ── */
+.dashboard .module {
+    width: 100% !important;
+    margin-bottom: 20px !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+}
+
+.dashboard .module table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+}
+
+.dashboard .module table th,
+.dashboard .module table td {
+    width: auto !important;
+}
+
+/* Model name column stretches to push action links to the right */
+.dashboard .module table td:first-child,
+.dashboard .module table th:first-child {
+    width: 60% !important;
+}
+
+/* Clear floats after dashboard content */
+.dashboard #content-main::after,
+#content-main::after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+
+/* ════════════════════════════════════════════
+   3. LOGOUT CONFIRMATION CARD (Pure CSS modal)
+   ════════════════════════════════════════════ */
+
+/* Overlay backdrop */
+#admin-logout-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+}
+
+#admin-logout-overlay.active {
+    display: flex;
+}
+
+/* The card itself */
+#admin-logout-card {
+    background: #1e2a38;
+    color: #e2e8f0;
+    border-radius: 16px;
+    padding: 0;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    animation: cardSlideIn 0.25s ease;
+}
+
+@keyframes cardSlideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+}
+
+#admin-logout-card .card-header {
+    background: #dc2626;
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#admin-logout-card .card-header .card-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+#admin-logout-card .card-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+}
+
+#admin-logout-card .card-body {
+    padding: 28px;
+    text-align: center;
+}
+
+#admin-logout-card .card-body .icon-wrap {
+    font-size: 3.5rem;
+    margin-bottom: 16px;
+    opacity: 0.85;
+}
+
+#admin-logout-card .card-body p {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    margin: 0 0 8px;
+    line-height: 1.6;
+}
+
+#admin-logout-card .card-body p strong {
+    color: #e2e8f0;
+}
+
+#admin-logout-card .card-footer {
+    padding: 16px 28px 28px;
+    display: flex;
+    gap: 12px;
+}
+
+#admin-logout-card .card-footer button {
+    flex: 1;
+    padding: 12px 0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    letter-spacing: 0.03em;
+}
+
+#admin-logout-card .btn-confirm-logout {
+    background: #dc2626;
+    color: #fff;
+}
+#admin-logout-card .btn-confirm-logout:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
+
+#admin-logout-card .btn-cancel-logout {
+    background: rgba(255,255,255,0.07);
+    color: #94a3b8;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+}
+#admin-logout-card .btn-cancel-logout:hover {
+    background: rgba(255,255,255,0.12);
+    color: #e2e8f0;
+}
+
+
+/* ════════════════════════════════════════════
+   4. HEADER PADDING
+   ════════════════════════════════════════════ */
+#header {
+    padding: 12px 30px !important;
+}
+
+
+/* ════════════════════════════════════════════
+   5. FORM PAGES — Fix Delete Button Cut-off
+   ════════════════════════════════════════════ */
+.submit-row {
+    overflow: visible !important;
+    padding-bottom: 20px !important;
+    box-sizing: border-box !important;
+}
+
+.submit-row p.deletelink-box {
+    overflow: visible !important;
+    float: right !important;
+}
+
+.submit-row a.deletelink {
+    display: inline-block !important;
+    white-space: nowrap !important;
+}
+
+
+/* ════════════════════════════════════════════
+   6. RESPONSIVE
+   ════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+    .dashboard .colMS,
+    .dashboard .colSM,
+    .dashboard #recent-actions-module {
+        float: none !important;
+        width: 100% !important;
+        padding-right: 0 !important;
+    }
+    .aligned label {
+        width: 100% !important;
+        float: none !important;
+        display: block !important;
+        padding-bottom: 5px !important;
+    }
+    .aligned .vTextField,
+    .aligned .vURLField,
+    .aligned .vEmailField,
+    .aligned .vLargeTextField,
+    .aligned .vSelectField {
+        max-width: 100% !important;
+    }
+}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookmarks | Trollyfy{% endblock %}
+
+{% block content %}
+<div class="container px-4">
+    <div class="mb-5">
+        <h2 class="fw-bold text-dark">My Saved Items</h2>
+        <p class="text-secondary">Keep track of the university deals you're interested in.</p>
+    </div>
+
+    {% if bookmarks %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4 mb-5">
+            {% for mark in bookmarks %}
+                {% with listing=mark.listing %}
+                <div class="col" id="wish-item-{{ listing.pk }}">
+                    <div class="card border-0 shadow-sm rounded-4 p-2 h-100 position-relative" style="transition: transform 0.3s ease;">
+                        <div class="position-relative overflow-hidden rounded-4" style="aspect-ratio: 1/1;">
+                            <a href="{% url 'toggle_wishlist' listing.pk %}" class="position-absolute top-0 end-0 m-3 bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; text-decoration: none; color: #ef4444; z-index: 10;">
+                                <i class="bi bi-heart-fill"></i>
+                            </a>
+                            {% if listing.images.all %}
+                                <img src="{{ listing.images.first.image.url }}" class="w-100 h-100" style="object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+                                    <i class="bi bi-image fs-1"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="px-2 pt-3">
+                            <h6 class="fw-bold mb-1 text-truncate">{{ listing.title }}</h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="fw-bold text-dark fs-5">${{ listing.price }}</div>
+                                <div class="badge bg-primary-subtle text-primary rounded-pill px-3">{{ listing.get_category_display }}</div>
+                            </div>
+                            <div class="mt-3">
+                                <a href="{% url 'listing_detail' listing.pk %}" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-bold py-2">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endwith %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-heart fs-1 text-muted opacity-25 mb-3"></i>
+            <h4 class="fw-bold">Your wishlist is empty</h4>
+            <p class="text-secondary">You haven't saved any items yet. Start exploring the campus deals!</p>
+            <a href="{% url 'index' %}" class="btn btn-primary rounded-pill px-5 py-2 mt-3 fw-bold shadow-sm">Explore Marketplace</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

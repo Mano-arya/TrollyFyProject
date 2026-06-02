@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}My Report History | Trollyfy{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <div class="mb-4 d-flex align-items-center justify-content-between">
+            <div>
+                <h2 class="fw-bold mb-0">Moderation History</h2>
+                <p class="text-muted small">Track the status of items you've flagged or system feedback you've shared.</p>
+            </div>
+            <a href="{% url 'report_system' %}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                <i class="bi bi-plus-lg"></i> New System Report
+            </a>
+        </div>
+
+        {% if reports %}
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3">Issue / Listing</th>
+                                <th class="py-3">Category</th>
+                                <th class="py-3 text-center">Status</th>
+                                <th class="py-3">Date Submitted</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in reports %}
+                                <tr>
+                                    <td class="ps-4">
+                                        {% if r.listing %}
+                                            <a href="{% url 'listing_detail' r.listing.pk %}" class="text-decoration-none fw-bold text-dark">
+                                                {{ r.listing.title|truncatechars:35 }}
+                                            </a>
+                                        {% else %}
+                                            <span class="fw-bold text-muted">System Platform Issue</span>
+                                        {% endif %}
+                                        <div class="small text-muted text-truncate" style="max-width: 250px;">{{ r.description|default:"No details provided." }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="small badge bg-light text-dark border">{{ r.get_reason_display }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if r.is_resolved %}
+                                            <span class="badge bg-success-subtle text-success rounded-pill px-3">
+                                                <i class="bi bi-check-circle-fill me-1"></i> Resolved
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-3">
+                                                <i class="bi bi-hourglass-split me-1"></i> Pending
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="small text-muted">
+                                        {{ r.created_at|date:"M d, Y" }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="card border-0 shadow-sm rounded-4 text-center py-5">
+                <div class="card-body">
+                    <i class="bi bi-shield-check display-3 text-muted opacity-25"></i>
+                    <h5 class="fw-bold mt-3">All clear!</h5>
+                    <p class="text-muted">You haven't submitted any reports yet.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

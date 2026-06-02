@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}My Conversations | Trollyfy{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <div class="mb-4 d-flex align-items-center gap-3">
+            <h2 class="fw-bold mb-0">Messages</h2>
+            <span class="badge bg-primary rounded-pill">{{ rooms.count }}</span>
+        </div>
+
+        {% if rooms %}
+            <div class="list-group shadow-sm border-0 rounded-4 overflow-hidden">
+                {% for room in rooms %}
+                    <a href="{% url 'chat_room' room.pk %}" class="list-group-item list-group-item-action border-0 py-3 d-flex align-items-center gap-2 gap-md-4">
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border" style="width: 60px; height: 60px; flex-shrink: 0; overflow: hidden;">
+                            {% for p in room.participants.all %}
+                                {% if p != user %}
+                                    {% if p.profile_picture %}
+                                        <img src="{{ p.profile_picture.url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    {% else %}
+                                        <span class="fw-bold text-primary">{{ p.username|first|upper }}</span>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="flex-grow-1 overflow-hidden">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h6 class="fw-bold mb-1 text-truncate pe-2" style="max-width: calc(100% - 70px);">{{ room.listing.title }}</h6>
+                                <small class="text-muted flex-shrink-0" style="font-size: 0.75rem;">{{ room.messages.last.timestamp|timesince }}</small>
+                            </div>
+                            <p class="text-muted small mb-0 text-truncate">
+                                {% if room.messages.last %}
+                                    <span class="fw-medium">{% if room.messages.last.sender == user %}You:{% else %}{{ room.messages.last.sender.username }}:{% endif %}</span> 
+                                    {{ room.messages.last.content }}
+                                {% else %}
+                                    No messages yet. Start chatting!
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% with unread=room.messages.last %}
+                            {% if not unread.is_read and unread.sender != user %}
+                                <div class="bg-danger rounded-circle" style="width: 10px; height: 10px;"></div>
+                            {% endif %}
+                        {% endwith %}
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card border-0 shadow-sm rounded-4 text-center py-5">
+                <div class="card-body">
+                    <i class="bi bi-chat-dots display-3 text-muted opacity-25"></i>
+                    <h5 class="fw-bold mt-3">No active chats</h5>
+                    <p class="text-muted">Start a conversation by clicking 'Chat with Seller' on any product.</p>
+                    <a href="{% url 'index' %}" class="btn btn-primary rounded-pill px-4 mt-2">Explore Marketplace</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

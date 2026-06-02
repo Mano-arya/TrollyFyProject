@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Report a Bug | Trollyfy{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-7 col-lg-5">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-dark text-white text-center py-4">
+                <i class="bi bi-bug-fill display-6"></i>
+                <h4 class="fw-bold mb-0">System Feedback</h4>
+                <p class="small opacity-75 mb-0">Tell us what's broken or can be improved</p>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted small text-center mb-4">Found a flaw in the system? Reporting bugs helps us build a better Trollyfy for everyone.</p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Issue Category</label>
+                        <select name="reason" class="form-select rounded-3" required>
+                            <option value="SYSTEM_BUG" selected>System Flaw/Bug Report</option>
+                            <option value="MISCATEGORIZED">Optimization/UX Suggestion</option>
+                            <option value="OTHER">General Platform Feedback</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Describe the Issue</label>
+                        <textarea name="description" class="form-control rounded-3" rows="5" required placeholder="What happened? What were you doing when the flaw occurred?"></textarea>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-dark btn-lg rounded-pill fw-bold">Submit Bug Report</button>
+                        <a href="{% url 'profile' %}" class="btn btn-link text-muted text-decoration-none small">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
